@@ -24,10 +24,11 @@ limit is hit, no more requests are allowed until the next window starts.
 - Use cases: simple rate limits with clear reset intervals.
 - Lives at `rate/fixedwindow/`.
 
-### 4. Sliding Window ⏳
+### 4. Sliding Window ✅
 Continuously checks the recent time window (e.g., last 60 seconds). As
 time moves, requests "fall out" of the window, allowing new ones.
 - Use cases: smoother rate limiting that avoids bursts.
+- Lives at `rate/slidingwindow/`.
 
 ### 5. Adaptive (Dynamic) ⏳
 Adjusts limits based on system load, user behavior, or usage tier. Can
@@ -47,7 +48,7 @@ increase or decrease limits dynamically.
 1. Token Bucket ✅
 2. Leaky Bucket ✅
 3. Fixed Window ✅
-4. Sliding Window
+4. Sliding Window ✅
 5. Adaptive
 6. Thorough tests and examples (rolling, per strategy)
 7. Publish v1
