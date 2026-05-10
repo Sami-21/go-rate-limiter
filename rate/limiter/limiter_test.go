@@ -1,4 +1,4 @@
-package ratelimiter
+package limiter
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestLimiterAllowsWithinCapacity(t *testing.T) {
-	limiter := NewLimiter(2, 1)
+	limiter := New(2, 1)
 
 	if !limiter.Allow() {
 		t.Fatal("expected first request to be allowed")
@@ -18,7 +18,7 @@ func TestLimiterAllowsWithinCapacity(t *testing.T) {
 }
 
 func TestLimiterBlocksWhenCapacityExceeded(t *testing.T) {
-	limiter := NewLimiter(1, 1)
+	limiter := New(1, 1)
 
 	if !limiter.Allow() {
 		t.Fatal("expected first request to be allowed")
@@ -30,7 +30,7 @@ func TestLimiterBlocksWhenCapacityExceeded(t *testing.T) {
 }
 
 func TestLimiterRefillsOverTime(t *testing.T) {
-	limiter := NewLimiter(1, 10)
+	limiter := New(1, 10)
 
 	if !limiter.Allow() {
 		t.Fatal("expected first request to be allowed")

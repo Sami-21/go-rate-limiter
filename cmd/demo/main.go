@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"go-rate-limiter/rateLimiter"
+	"go-rate-limiter/rate/limiter"
 )
 
 func main() {
-	limiter := ratelimiter.NewLimiter(3, 1)
+	limiter := limiter.New(3, 1)
 
 	for i := 1; i <= 10; i++ {
 		if limiter.Allow() {
