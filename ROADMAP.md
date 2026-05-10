@@ -12,10 +12,11 @@ A fixed number of tokens refills over time. Each request consumes a token.
 - Use cases: API rate limiting, burst handling.
 - Lives at `rate/tokenbucket/`.
 
-### 2. Leaky Bucket ⏳
+### 2. Leaky Bucket ✅
 Requests are processed at a fixed rate, and excess requests are queued
 (up to a limit).
 - Use cases: smoothing out traffic, ensuring steady processing rates.
+- Lives at `rate/leakybucket/`.
 
 ### 3. Fixed Window ⏳
 Counts requests within a fixed timeframe (e.g., per minute). Once the
@@ -43,7 +44,7 @@ increase or decrease limits dynamically.
 ## Implementation order
 
 1. Token Bucket ✅
-2. Leaky Bucket
+2. Leaky Bucket ✅
 3. Fixed Window
 4. Sliding Window
 5. Adaptive
