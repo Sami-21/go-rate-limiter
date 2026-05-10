@@ -4,7 +4,7 @@ A small Go library providing rate-limiting strategies for HTTP servers, API
 clients, and anywhere else you need to bound throughput.
 
 > **Status:** early. Only the **token bucket** strategy is implemented today.
-> See [`project.md`](project.md) for the planned strategies (leaky bucket,
+> See [`ROADMAP.md`](ROADMAP.md) for the planned strategies (leaky bucket,
 > fixed window, sliding window, adaptive).
 
 ## Install
