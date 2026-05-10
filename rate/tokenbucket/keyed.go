@@ -11,8 +11,12 @@ type Keyed struct {
 
 	capacity float64
 	rate     float64
+	ttl      time.Duration
 
-	ttl time.Duration
+	now      func() time.Time
+	done     chan struct{}
+	stopOnce sync.Once
+	wg       sync.WaitGroup
 }
 
 type entry struct {
@@ -20,20 +24,29 @@ type entry struct {
 	lastSeen time.Time
 }
 
-func NewKeyed(capacity int, ratePerSecond float64, ttl time.Duration) *Keyed {
-	return &Keyed{
+func NewKeyed(capacity int, ratePerSecond float64, ttl, cleanupInterval time.Duration) *Keyed {
+	k := &Keyed{
 		entries:  make(map[string]*entry),
 		capacity: float64(capacity),
 		rate:     ratePerSecond,
 		ttl:      ttl,
+		now:      time.Now,
+		done:     make(chan struct{}),
 	}
+
+	if cleanupInterval > 0 {
+		k.wg.Add(1)
+		go k.janitor(cleanupInterval)
+	}
+
+	return k
 }
 
 func (k *Keyed) Allow(key string) bool {
 	k.mu.Lock()
 	defer k.mu.Unlock()
 
-	now := time.Now()
+	now := k.now()
 
 	e, exists := k.entries[key]
 	if !exists {
@@ -49,9 +62,34 @@ func (k *Keyed) Allow(key string) bool {
 	return e.bucket.Allow()
 }
 
-func (k *Keyed) cleanup() {
-	now := time.Now()
+func (k *Keyed) Stop() {
+	k.stopOnce.Do(func() {
+		close(k.done)
+	})
+	k.wg.Wait()
+}
 
+func (k *Keyed) janitor(interval time.Duration) {
+	defer k.wg.Done()
+
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			k.cleanup()
+		case <-k.done:
+			return
+		}
+	}
+}
+
+func (k *Keyed) cleanup() {
+	k.mu.Lock()
+	defer k.mu.Unlock()
+
+	now := k.now()
 	for key, e := range k.entries {
 		if now.Sub(e.lastSeen) > k.ttl {
 			delete(k.entries, key)
