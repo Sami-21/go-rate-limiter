@@ -1,48 +1,48 @@
-package limiter
+package tokenbucket
 
 import (
 	"testing"
 	"time"
 )
 
-func TestLimiterAllowsWithinCapacity(t *testing.T) {
-	limiter := New(2, 1)
+func TestBucketAllowsWithinCapacity(t *testing.T) {
+	b := New(2, 1)
 
-	if !limiter.Allow() {
+	if !b.Allow() {
 		t.Fatal("expected first request to be allowed")
 	}
 
-	if !limiter.Allow() {
+	if !b.Allow() {
 		t.Fatal("expected second request to be allowed")
 	}
 }
 
-func TestLimiterBlocksWhenCapacityExceeded(t *testing.T) {
-	limiter := New(1, 1)
+func TestBucketBlocksWhenCapacityExceeded(t *testing.T) {
+	b := New(1, 1)
 
-	if !limiter.Allow() {
+	if !b.Allow() {
 		t.Fatal("expected first request to be allowed")
 	}
 
-	if limiter.Allow() {
+	if b.Allow() {
 		t.Fatal("expected second request to be blocked")
 	}
 }
 
-func TestLimiterRefillsOverTime(t *testing.T) {
-	limiter := New(1, 10)
+func TestBucketRefillsOverTime(t *testing.T) {
+	b := New(1, 10)
 
-	if !limiter.Allow() {
+	if !b.Allow() {
 		t.Fatal("expected first request to be allowed")
 	}
 
-	if limiter.Allow() {
+	if b.Allow() {
 		t.Fatal("expected second request to be blocked")
 	}
 
 	time.Sleep(120 * time.Millisecond)
 
-	if !limiter.Allow() {
+	if !b.Allow() {
 		t.Fatal("expected request to be allowed after refill")
 	}
 }

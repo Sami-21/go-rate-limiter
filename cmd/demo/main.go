@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	"go-rate-limiter/rate/limiter"
+	"go-rate-limiter/rate/tokenbucket"
 )
 
 func main() {
-	limiter := limiter.New(3, 1)
+	b := tokenbucket.New(3, 1)
 
 	for i := 1; i <= 10; i++ {
-		if limiter.Allow() {
+		if b.Allow() {
 			fmt.Println("request", i, "allowed")
 		} else {
 			fmt.Println("request", i, "blocked")
