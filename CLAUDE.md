@@ -11,7 +11,7 @@ go run ./cmd/demo                                   # run the demo program
 go build ./...                                      # build everything
 ```
 
-Module path: `go-rate-limiter` (Go 1.25.1, no external dependencies).
+Module path: `github.com/sami-21/go-rate-limiter` (Go 1.25.1, no external dependencies).
 
 ## Project vision
 

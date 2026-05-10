@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"go-rate-limiter/rate/tokenbucket"
+	"github.com/sami-21/go-rate-limiter/rate/tokenbucket"
 )
 
 func main() {
