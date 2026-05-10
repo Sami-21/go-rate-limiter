@@ -99,6 +99,30 @@ func TestBucketParallelAllow(t *testing.T) {
 	}
 }
 
+func TestNewPanicsOnInvalidArgs(t *testing.T) {
+	cases := []struct {
+		name     string
+		capacity int
+		rate     float64
+	}{
+		{"zero capacity", 0, 1},
+		{"negative capacity", -1, 1},
+		{"zero rate", 1, 0},
+		{"negative rate", 1, -1},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Fatalf("expected New(%d, %v) to panic", tc.capacity, tc.rate)
+				}
+			}()
+			New(tc.capacity, tc.rate)
+		})
+	}
+}
+
 func newBucketWithFakeClock(capacity int, ratePerSecond float64) (*Bucket, func(time.Duration)) {
 	now := time.Unix(0, 0)
 	b := New(capacity, ratePerSecond)

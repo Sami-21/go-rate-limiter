@@ -33,7 +33,7 @@ func TestKeyedLazyCreation(t *testing.T) {
 }
 
 func TestKeyedPerKeyIsolation(t *testing.T) {
-	k := NewKeyed(1, 0, time.Minute, 0)
+	k := NewKeyed(1, 1, time.Minute, 0)
 	defer k.Stop()
 
 	if !k.Allow("alice") {
@@ -100,6 +100,33 @@ func TestKeyedConcurrentAllow(t *testing.T) {
 	}
 
 	wg.Wait()
+}
+
+func TestNewKeyedPanicsOnInvalidArgs(t *testing.T) {
+	cases := []struct {
+		name     string
+		capacity int
+		rate     float64
+		ttl      time.Duration
+	}{
+		{"zero capacity", 0, 1, time.Minute},
+		{"negative capacity", -1, 1, time.Minute},
+		{"zero rate", 1, 0, time.Minute},
+		{"negative rate", 1, -1, time.Minute},
+		{"zero ttl", 1, 1, 0},
+		{"negative ttl", 1, 1, -1},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Fatalf("expected NewKeyed(%d, %v, %v, 0) to panic", tc.capacity, tc.rate, tc.ttl)
+				}
+			}()
+			NewKeyed(tc.capacity, tc.rate, tc.ttl, 0)
+		})
+	}
 }
 
 func newKeyedWithFakeClock(capacity int, ratePerSecond float64, ttl time.Duration) (*Keyed, func(time.Duration)) {
