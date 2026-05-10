@@ -18,10 +18,11 @@ Requests are processed at a fixed rate, and excess requests are queued
 - Use cases: smoothing out traffic, ensuring steady processing rates.
 - Lives at `rate/leakybucket/`.
 
-### 3. Fixed Window ⏳
+### 3. Fixed Window ✅
 Counts requests within a fixed timeframe (e.g., per minute). Once the
 limit is hit, no more requests are allowed until the next window starts.
 - Use cases: simple rate limits with clear reset intervals.
+- Lives at `rate/fixedwindow/`.
 
 ### 4. Sliding Window ⏳
 Continuously checks the recent time window (e.g., last 60 seconds). As
@@ -45,7 +46,7 @@ increase or decrease limits dynamically.
 
 1. Token Bucket ✅
 2. Leaky Bucket ✅
-3. Fixed Window
+3. Fixed Window ✅
 4. Sliding Window
 5. Adaptive
 6. Thorough tests and examples (rolling, per strategy)
