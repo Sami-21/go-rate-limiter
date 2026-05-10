@@ -3,15 +3,17 @@
 A small Go library providing rate-limiting strategies for HTTP servers, API
 clients, and anywhere else you need to bound throughput.
 
-> **Status:** early. The **token bucket** and **leaky bucket** strategies are
-> implemented today. See [`ROADMAP.md`](ROADMAP.md) for the planned strategies
-> (fixed window, sliding window, adaptive).
+> **Status:** early. The **token bucket**, **leaky bucket**, **fixed
+> window**, and **sliding window** strategies are implemented today. See
+> [`ROADMAP.md`](ROADMAP.md) for the planned adaptive strategy.
 
 ## Install
 
 ```bash
 go get github.com/sami-21/go-rate-limiter/rate/tokenbucket
 go get github.com/sami-21/go-rate-limiter/rate/leakybucket
+go get github.com/sami-21/go-rate-limiter/rate/fixedwindow
+go get github.com/sami-21/go-rate-limiter/rate/slidingwindow
 ```
 
 Requires Go 1.25+. No external dependencies.
@@ -74,6 +76,63 @@ func main() {
 }
 ```
 
+## Fixed window
+
+Use `fixedwindow` for simple limits with clear reset intervals, such as 3
+requests per minute. The counter resets when the next fixed window starts:
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+
+    "github.com/sami-21/go-rate-limiter/rate/fixedwindow"
+)
+
+func main() {
+    b := fixedwindow.New(3, time.Minute)
+
+    for i := 1; i <= 4; i++ {
+        if b.Allow() {
+            fmt.Println("request", i, "allowed")
+        } else {
+            fmt.Println("request", i, "blocked")
+        }
+    }
+}
+```
+
+## Sliding window
+
+Use `slidingwindow` when you want a smoother rolling limit, such as 3 requests
+within the last minute. Accepted requests expire individually as they age out of
+the trailing window:
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+
+    "github.com/sami-21/go-rate-limiter/rate/slidingwindow"
+)
+
+func main() {
+    b := slidingwindow.New(3, time.Minute)
+
+    for i := 1; i <= 4; i++ {
+        if b.Allow() {
+            fmt.Println("request", i, "allowed")
+        } else {
+            fmt.Println("request", i, "blocked")
+        }
+    }
+}
+```
+
 ## Per-key limiting
 
 Use `Keyed` for per-user, per-IP, or per-tenant limiting. Stale entries are
@@ -101,12 +160,16 @@ Full docs render on pkg.go.dev once published:
 
 - [`rate/tokenbucket`](https://pkg.go.dev/github.com/sami-21/go-rate-limiter/rate/tokenbucket)
 - [`rate/leakybucket`](https://pkg.go.dev/github.com/sami-21/go-rate-limiter/rate/leakybucket)
+- [`rate/fixedwindow`](https://pkg.go.dev/github.com/sami-21/go-rate-limiter/rate/fixedwindow)
+- [`rate/slidingwindow`](https://pkg.go.dev/github.com/sami-21/go-rate-limiter/rate/slidingwindow)
 
 Locally:
 
 ```bash
 go doc ./rate/tokenbucket
 go doc ./rate/leakybucket
+go doc ./rate/fixedwindow
+go doc ./rate/slidingwindow
 ```
 
 ## Development
